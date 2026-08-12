@@ -52,11 +52,9 @@ public class CompilerInterface extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	// TODO: substituir pelos nomes reais dos integrantes da equipe.
 	private static final String[] EQUIPE = {
-			"Nome do Integrante 1",
-			"Nome do Integrante 2",
-			"Nome do Integrante 3"
+			"Felipe Behling",
+			"Gustavo Henrique Probst"
 	};
 
 	private static final Dimension BUTTON_SIZE = new Dimension(140, 56);

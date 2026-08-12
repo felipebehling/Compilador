@@ -32,7 +32,27 @@ Troque pelos nomes reais da equipe antes de compilar e enviar o trabalho.
 
 Este ambiente de execução não possui JDK/rede disponível para compilar e
 testar o projeto automaticamente, então o `.jar` **não** está incluso — seguem
-os comandos para gerá-lo na sua máquina (com JDK 8 ou superior instalado):
+os comandos para gerá-lo na sua máquina (com JDK 8 ou superior instalado —
+confirme com `javac -version` no terminal).
+
+### Windows (CMD ou PowerShell)
+
+Dê duplo clique em `compile.bat`, **ou**, dentro da pasta do projeto:
+
+```bat
+compile.bat
+```
+
+Isso funciona tanto no `cmd.exe` quanto no PowerShell (o Windows executa
+`.bat` normalmente nos dois). Se preferir digitar os comandos manualmente:
+
+```bat
+javac -encoding UTF-8 -d bin src\compilador\*.java
+jar cfe interface-equipeXX.jar compilador.CompilerInterface -C bin .
+java -jar interface-equipeXX.jar
+```
+
+### Linux / macOS
 
 ```bash
 chmod +x compile.sh
