@@ -14,8 +14,8 @@ if errorlevel 1 (
 )
 
 echo Gerando JAR executavel...
-jar cfe interface-equipeXX.jar compilador.CompilerInterface -C bin .
+jar cfe interface-equipe06.jar compilador.CompilerInterface -C bin .
 
 echo.
-echo Pronto! Para executar: java -jar interface-equipeXX.jar
+echo Pronto! Para executar: java -jar interface-equipe06.jar
 pause
