@@ -1,32 +1,6 @@
 # Interface do Compilador — Trabalho Final, parte 1
 
-Implementação em Java/Swing de todos os itens descritos em `p1-3aN.md`.
-
 ## Estrutura
-
-```
-src/compilador/
-  CompilerInterface.java   -> classe principal (JFrame), contém main()
-  NumberedBorder.java      -> borda com numeração de linhas (arquivo fornecido)
-  IconFactory.java         -> ícones dos botões, desenhados via Java2D (sem
-                               depender de arquivos de imagem externos)
-compile.sh                 -> script para compilar e gerar o .jar
-```
-
-## ⚠️ Antes de entregar: edite os nomes da equipe
-
-O botão **Equipe [F1]** mostra os nomes definidos na constante `EQUIPE`, no
-topo de `CompilerInterface.java`:
-
-```java
-private static final String[] EQUIPE = {
-        "Nome do Integrante 1",
-        "Nome do Integrante 2",
-        "Nome do Integrante 3"
-};
-```
-
-Troque pelos nomes reais da equipe antes de compilar e enviar o trabalho.
 
 ## Como compilar e gerar o .jar
 
@@ -67,10 +41,6 @@ javac -encoding UTF-8 -d bin src/compilador/*.java
 jar cfe interface-equipeXX.jar compilador.CompilerInterface -C bin .
 java -jar interface-equipeXX.jar
 ```
-
-Renomeie `interface-equipeXX.jar` para `interface<numero_da_equipe>` conforme
-pedido no enunciado antes de compactar e enviar no AVA (junto com a pasta
-`src` com o código-fonte).
 
 ## Como os itens do enunciado foram atendidos
 
