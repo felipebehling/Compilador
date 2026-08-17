@@ -1,4 +1,4 @@
-# Interface do Compilador — Trabalho Final, parte 1
+# Interface do Compilador — Trabalho, parte 1
 
 ## Estrutura
 
