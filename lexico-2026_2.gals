@@ -1,0 +1,60 @@
+#Options
+GenerateScanner = true
+GenerateParser = false
+Language = Java
+ScannerName = Lexico
+ScannerCaseSensitive = true
+ScannerTable = Full
+Input = Stream
+#RegularDefinitions
+mai: [A-z]
+min: [a-z]
+dig: [0-9]
+#Tokens
+// simbolos especiais
+"+"
+":"
+";"
+"["
+"]"
+"("
+")"
+"{"
+"}"
+"<"
+">"
+
+// palavra reservada (token base)
+palavra_reservada : {min}+ (({mai}? {min}+))+
+
+// palavras reservadas = casos especiais de palavra_reservada
+and       = palavra_reservada : "and"
+false     = palavra_reservada : "false"
+if        = palavra_reservada : "if"
+in        = palavra_reservada : "in"
+isFalseDo = palavra_reservada : "isFalseDo"
+isTrueDo  = palavra_reservada : "isTrueDo"
+module    = palavra_reservada : "module"
+not       = palavra_reservada : "not"
+or        = palavra_reservada : "or"
+out       = palavra_reservada : "out"
+true      = palavra_reservada : "true"
+while     = palavra_reservada : "while"
+
+// identificadores (int/float/string/bool -> "identificador" na saída)
+int    : "i_" ({min} | {mai}) ({min} | {mai} | {dig})*
+float  : "f_" ({min} | {mai}) ({min} | {mai} | {dig})*
+string : "s_" ({min} | {mai}) ({min} | {mai} | {dig})*
+bool   : "b_" ({min} | {mai}) ({min} | {mai} | {dig})*
+
+// constantes
+cte_float : {dig}+ "," {dig}+
+cte_int   : {dig}+
+cte_string :! \" ([^\n \" \\])* \"
+
+
+// comentario de bloco @! ... !@ (ignorado)
+:! "@" "!" ([^ "!" "@"])* "!" "@"
+
+// formatação (ignorada)
+: [\n \s \t]
