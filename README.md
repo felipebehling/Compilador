@@ -58,7 +58,7 @@ java -jar interface-equipeXX.jar
 | 11 – abrir (mantém estado se cancelado) | `onAbrir()` |
 | 12 – salvar / salvar como | `onSalvar()` |
 | 13 – copiar/colar/recortar padrão | `onCopiar()/onColar()/onRecortar()` (usam `JTextArea.copy/paste/cut`, com os atalhos padrão do próprio componente) |
-| 14 – compilar (mensagem fixa) | `onCompilar()` |
+| 14 – compilar (análise léxica) | `onCompilar()`, usando o analisador `Lexico`/`Constants`/`ScannerConstants` gerado pelo GALS a partir de `lexico-2026_2.gals` |
 | 15 – equipe (mensagem fixa) | `onEquipe()` |
 
 ## Observações de implementação
