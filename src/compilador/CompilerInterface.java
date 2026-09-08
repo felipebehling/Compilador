@@ -242,6 +242,11 @@ public class CompilerInterface extends JFrame {
 		File arquivo = chooser.getSelectedFile();
 		try {
 			String conteudo = new String(Files.readAllBytes(arquivo.toPath()), StandardCharsets.UTF_8);
+			// Normaliza quebras de linha do Windows (CRLF) e do Mac clássico (CR)
+			// para \n. O ScannerConstants já trata \r como espaço em branco
+			// ignorável, mas normalizar aqui também evita qualquer surpresa
+			// (ex.: contagem de linha) vinda de arquivos .txt salvos fora do editor.
+			conteudo = conteudo.replace("\r\n", "\n").replace("\r", "\n");
 			editorArea.setText(conteudo);
 			editorArea.setCaretPosition(0);
 			messageArea.setText("");
@@ -318,9 +323,126 @@ public class CompilerInterface extends JFrame {
 		editorArea.cut();
 	}
 
-	/** Item 14: compilar -> mensagem fixa (substitui qualquer mensagem anterior). */
+	/** Item 14: compilar -> executa a análise léxica sobre o texto do editor. */
+	/**
+	 * Item 14: compilar -> executa a análise léxica sobre o texto do editor,
+	 * seguindo exatamente o formato de saída exigido no Trabalho Final - parte 2:
+	 *  - sucesso: uma linha "linha | classe | lexema" por token reconhecido,
+	 *    seguida da mensagem "programa compilado com sucesso";
+	 *  - erro: uma única linha "linha N: <descrição do erro>", incluindo o
+	 *    símbolo/palavra inválido apenas nas categorias em que isso é exigido.
+	 */
 	private void onCompilar() {
-		messageArea.setText("compilação de programas ainda não foi implementada");
+		String codigo = editorArea.getText();
+
+		if (codigo.isEmpty()) {
+			messageArea.setText("Nenhum código para compilar.");
+			return;
+		}
+
+		StringBuilder saida = new StringBuilder();
+		Lexico lexico = new Lexico(codigo);
+
+		try {
+			Token token;
+			while ((token = lexico.nextToken()) != null) {
+
+				// O GALS resolve "casos especiais" de palavra_reservada devolvendo
+				// o próprio token base quando o lexema não bate com nenhuma das
+				// palavras reservadas cadastradas (ex.: "iftruedo"). Isso não é um
+				// erro para o GALS, mas É um erro léxico para a linguagem 2026.2
+				// (ver enunciado / exemplo "iftruedo palavra reservada inválida").
+				// Por isso, esse caso é detectado aqui e tratado como erro.
+				if (token.getId() == Constants.t_palavra_reservada) {
+					int linha = calcularLinha(codigo, token.getPosition());
+					messageArea.setText("linha " + linha + ": " + token.getLexeme()
+							+ " palavra reservada inválida");
+					messageArea.setCaretPosition(0);
+					return;
+				}
+
+				int linha = calcularLinha(codigo, token.getPosition());
+				String classe = classificarToken(token.getId());
+				saida.append("linha ").append(linha)
+						.append(" | ").append(classe)
+						.append(" | ").append(token.getLexeme())
+						.append('\n');
+			}
+			saida.append("programa compilado com sucesso");
+		} catch (LexicalError erro) {
+			int linha = calcularLinha(codigo, erro.getPosition());
+			String categoria = erro.getMessage();
+
+			saida.setLength(0);
+			saida.append("linha ").append(linha).append(": ");
+
+			if ("símbolo inválido".equals(categoria)) {
+				saida.append(extrairSimbolo(codigo, erro.getPosition())).append(' ').append(categoria);
+			} else if ("palavra reservada inválida".equals(categoria)) {
+				saida.append(extrairPalavra(codigo, erro.getPosition())).append(' ').append(categoria);
+			} else {
+				// identificador inválido / constante_string inválida /
+				// comentário inválido ou não finalizado / constante inválida:
+				// o enunciado não pede o trecho reconhecido, só a mensagem e a linha.
+				saida.append(categoria);
+			}
+		}
+
+		messageArea.setText(saida.toString());
+		messageArea.setCaretPosition(0);
+	}
+
+	/**
+	 * Classifica um token pelo seu id, devolvendo a classe "por extenso" exigida
+	 * na saída (símbolo especial, palavra reservada, identificador, constante_int,
+	 * constante_float, constante_string). Os limites usam os próprios ids gerados
+	 * pelo GALS em {@link Constants}: primeiro vem o bloco de palavra_reservada
+	 * (base + casos especiais), depois os quatro identificadores tipados, depois
+	 * as três constantes, e por fim os símbolos especiais.
+	 */
+	private String classificarToken(int id) {
+		if (id >= Constants.t_palavra_reservada && id < Constants.t_int)
+			return "palavra reservada";
+		if (id >= Constants.t_int && id < Constants.t_cte_float)
+			return "identificador";
+		if (id == Constants.t_cte_int)
+			return "constante_int";
+		if (id == Constants.t_cte_float)
+			return "constante_float";
+		if (id == Constants.t_cte_string)
+			return "constante_string";
+		return "símbolo especial";
+	}
+
+	/** Converte um offset (posição absoluta no texto) em número de linha (1-based). */
+	private int calcularLinha(String texto, int offset) {
+		int linha = 1;
+		int limite = Math.min(offset, texto.length());
+		for (int i = 0; i < limite; i++) {
+			if (texto.charAt(i) == '\n')
+				linha++;
+		}
+		return linha;
+	}
+
+	/** Extrai o único caractere inválido que provocou um erro de "símbolo inválido". */
+	private String extrairSimbolo(String texto, int offset) {
+		if (offset < 0 || offset >= texto.length())
+			return "";
+		return String.valueOf(texto.charAt(offset));
+	}
+
+	/**
+	 * Extrai a sequência de letras a partir de um erro de "palavra reservada
+	 * inválida" (padrão malformado ou palavra fora da lista de reservadas),
+	 * para exibi-la junto da mensagem de erro.
+	 */
+	private String extrairPalavra(String texto, int offset) {
+		int i = Math.max(offset, 0);
+		int inicio = i;
+		while (i < texto.length() && Character.isLetter(texto.charAt(i)))
+			i++;
+		return texto.substring(inicio, i);
 	}
 
 	/** Item 15: equipe -> nomes da equipe (substitui qualquer mensagem anterior). */

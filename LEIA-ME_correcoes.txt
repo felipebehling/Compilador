@@ -1,0 +1,54 @@
+Correções aplicadas ao analisador léxico (Equipe 06) - Trabalho Final, parte 2
+================================================================================
+
+1) lexico-final1.gals
+   - Adicionado o símbolo especial "," (vírgula), que fazia parte da lista de
+     símbolos especiais do enunciado e estava ausente (só era usado dentro do
+     literal de constante_float).
+
+2) Constants.java / ScannerConstants.java
+   - Regenerados a partir do .gals corrigido usando o próprio motor do GALS.
+   - As mensagens em SCANNER_ERROR[] foram traduzidas manualmente para as
+     categorias exigidas no enunciado: "símbolo inválido", "palavra reservada
+     inválida", "identificador inválido", "constante_string inválida" e
+     "comentário inválido ou não finalizado" (mais uma categoria extra,
+     "constante inválida", para constantes numéricas malformadas, que não
+     tem uma mensagem específica definida no enunciado).
+
+3) CompilerInterface.java (método onCompilar)
+   - Saída de sucesso reescrita no formato exigido: "linha | classe | lexema"
+     por token, seguida da mensagem literal "programa compilado com sucesso".
+   - As classes de token agora são mapeadas para os nomes "por extenso" do
+     enunciado (identificador, palavra reservada, símbolo especial,
+     constante_int, constante_float, constante_string), em vez do nome bruto
+     da constante Java.
+   - Saída de erro reescrita como "linha N: <mensagem>", incluindo o símbolo
+     ou a palavra inválida apenas nas duas categorias em que o enunciado pede
+     isso (símbolo inválido / palavra reservada inválida).
+   - Corrigido um comportamento do próprio GALS: por padrão, uma sequência com
+     o formato de palavra reservada que não é uma das 12 palavras da lista
+     (ex.: "iftruedo") é aceita como token válido (o token "base"
+     palavra_reservada), em vez de gerar erro. Isso foi corrigido tratando
+     explicitamente esse caso como erro léxico "palavra reservada inválida".
+
+Validação: as saídas foram conferidas rodando o motor real do GALS (compilado
+a partir do código-fonte oficial em github.com/cegesser/gals) contra os dois
+exemplos do enunciado (comprovadamente idênticos) e contra casos de teste para
+cada uma das cinco categorias de erro exigidas.
+
+4) Correção adicional após bateria de testes (CRLF do Windows)
+   - lexico-final1.gals: a classe de espaços ignorados passou a incluir \r
+     (carriage return), além de \n, espaço e tab. Sem isso, qualquer arquivo
+     .txt salvo no Windows (quebra de linha \r\n) fazia o analisador léxico
+     falhar com "símbolo inválido" em TODA linha do programa, já que o \r
+     não era reconhecido como caractere de formatação ignorável.
+   - CompilerInterface.java (onAbrir): o conteúdo lido do arquivo agora é
+     normalizado (\r\n e \r isolado viram \n) como proteção extra, além da
+     correção no .gals.
+   - Testado com bateria de 21 casos cobrindo: as 12 palavras reservadas,
+     os 18 símbolos especiais, identificadores válidos/inválidos dos 4 tipos,
+     constantes válidas/inválidas, comentários (uma linha, várias linhas,
+     não finalizado de duas formas), um programa completo de exemplo,
+     sensibilidade a maiúsculas/minúsculas, maximal munch em símbolos
+     compostos (<-, <>) e em constante_float, e arquivo com quebra de
+     linha estilo Windows (CRLF). Todos os 21 casos passaram.

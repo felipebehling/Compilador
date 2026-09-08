@@ -4,28 +4,16 @@ GenerateParser = false
 Language = Java
 ScannerName = Lexico
 ScannerCaseSensitive = true
-ScannerTable = Full
-Input = Stream
+ScannerTable = Compact
+Input = String
 #RegularDefinitions
-mai: [A-z]
+mai: [A-Z]
 min: [a-z]
 dig: [0-9]
 #Tokens
-// simbolos especiais
-"+"
-":"
-";"
-"["
-"]"
-"("
-")"
-"{"
-"}"
-"<"
-">"
 
 // palavra reservada (token base)
-palavra_reservada : {min}+ (({mai}? {min}+))+
+palavra_reservada :! {min}+ ({mai}? {min}+)+
 
 // palavras reservadas = casos especiais de palavra_reservada
 and       = palavra_reservada : "and"
@@ -41,20 +29,42 @@ out       = palavra_reservada : "out"
 true      = palavra_reservada : "true"
 while     = palavra_reservada : "while"
 
+
 // identificadores (int/float/string/bool -> "identificador" na saída)
-int    : "i_" ({min} | {mai}) ({min} | {mai} | {dig})*
-float  : "f_" ({min} | {mai}) ({min} | {mai} | {dig})*
-string : "s_" ({min} | {mai}) ({min} | {mai} | {dig})*
-bool   : "b_" ({min} | {mai}) ({min} | {mai} | {dig})*
+int    :! i_ ({min} | {mai}) ({min} | {mai} | {dig})*
+float  :! f_ ({min} | {mai}) ({min} | {mai} | {dig})*
+string :! s_ ({min} | {mai}) ({min} | {mai} | {dig})*
+bool   :! b_ ({min} | {mai}) ({min} | {mai} | {dig})*
 
 // constantes
-cte_float : {dig}+ "," {dig}+
-cte_int   : {dig}+
+cte_float :! {dig}+ "," {dig}+
+cte_int   :! {dig}+
 cte_string :! \" ([^\n \" \\])* \"
 
+// simbolos especiais
+"+"
+","
+":"
+";"
+"["
+"]"
+"("
+")"
+"{"
+"}"
+"<"
+">"
+"="
+"-"
+"<-"
+"*"
+"<>"
+"/"
+
+// formatação (ignorada) - inclui \r para arquivos .txt salvos no Windows (CRLF)
+: [\n \r \s \t]
 
 // comentario de bloco @! ... !@ (ignorado)
 :! "@" "!" ([^ "!" "@"])* "!" "@"
 
-// formatação (ignorada)
-: [\n \s \t]
+
